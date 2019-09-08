@@ -1,0 +1,99 @@
+/*
+  Huge map Arduboy demo.
+
+  author: Miloslav Ciz
+  license: CC0 1.0
+*/
+
+#include "stdio.h"
+#include "stdint.h"
+#include "map.h"
+
+/*
+  Set the output type:
+
+  0: stdout, tile numbers
+  1: stdout, tile mapped to chars
+  2: png
+*/
+#define OUTPUT 2
+
+#define VIEW_X      0
+#define VIEW_Y      0
+#define VIEW_WIDTH  1024
+#define VIEW_HEIGHT 1024
+
+#if OUTPUT == 2
+#define CUTE_PNG_IMPLEMENTATION
+#include "cute_png.head"
+uint32_t img[VIEW_WIDTH * VIEW_HEIGHT];
+#endif
+
+const char hex[] = "0123456789ABCDEF";
+
+#if OUTPUT == 1
+  char tileMap[256];
+#endif
+
+int main()
+{
+  #if OUTPUT == 1
+    tileMap[T_GROUND]       = ' ';
+    tileMap[T_GROUND2]      = '.';
+    tileMap[T_GROUND3]      = ',';
+    tileMap[T_ROAD]         = 'x';
+    tileMap[T_ROAD2]        = '+';
+    tileMap[T_ROCK]         = 'o';
+    tileMap[T_TREE_T]       = 'A';
+    tileMap[T_TREE_B]       = 'I';
+    tileMap[T_BUSH]         = 'p';
+    tileMap[T_SIGN]         = 'T';
+    tileMap[T_HOUSE_ROOF]   = 'X';
+    tileMap[T_HOUSE_WINDOW] = '#';
+    tileMap[T_HOUSE_DOOR]   = 'H';
+    tileMap[T_BARREL]       = 'u';
+    tileMap[T_GRAVE]        = 'g';
+    tileMap[T_WATER]        = 'w';
+    tileMap[T_WATER_B_L]    = '<';
+    tileMap[T_WATER_B_R]    = '>';
+    tileMap[T_WATER_B_T]    = '^';
+    tileMap[T_WATER_B_B]    = 'v';
+    tileMap[T_WATER_B_TL]   = 'F';
+    tileMap[T_WATER_B_TR]   = '7';
+    tileMap[T_WATER_B_BL]   = 'L';
+    tileMap[T_WATER_B_BR]   = 'Z';
+  #endif
+
+  for (int16_t y = 0; y < VIEW_HEIGHT; ++y)
+  {
+    for (int16_t x = 0; x < VIEW_WIDTH; ++x)
+    {
+      uint8_t val = getMapTile(VIEW_X + x,VIEW_Y + y);
+
+      #if OUTPUT == 2
+        uint8_t rand0 = val * 11;
+        uint8_t rand1 = val * 30;
+        uint8_t rand2 = val * 130;
+        img[y * VIEW_WIDTH + x] = 0xFF000000 | (rand0 << 16) | (rand1 << 8) | rand2;
+      #elif OUTPUT == 1
+        printf("%c",tileMap[val]);
+      #elif OUTPUT == 0
+        char c1 = hex[val / 16]; 
+        char c2 = hex[val % 16];
+        printf("%c%c ",c1,c2);
+      #endif
+    }
+
+    printf("\n");
+  }
+
+  #if OUTPUT == 2
+    cp_image_t i;
+
+    i.w = VIEW_WIDTH;
+    i.h = VIEW_HEIGHT;
+    i.pix = img;
+
+    cp_save_png("out.png",&i);
+  #endif
+}
