@@ -1,9 +1,0 @@
-Key      CODE     SeqCode     Type
-______________________________________________
-left   |  A2    | 16        | Analog
-rigth  |  A1    | 15        | Analog
-up     |  A3    | 17        | Analog
-down   |  2     | 2         | Digital (why?)
-
-
-
